@@ -30,19 +30,25 @@ static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
 int main(int argc, const char **argv)
 {    
     std::string osm_data_file = "";
+
+    // Allow user to start the executable with an argument to load a custom map
     if( argc > 1 ) {
         for( int i = 1; i < argc; ++i )
             if( std::string_view{argv[i]} == "-f" && ++i < argc )
                 osm_data_file = argv[i];
     }
+    // Load the default map
     else {
         std::cout << "To specify a map file use the following format: " << std::endl;
         std::cout << "Usage: [executable] [-f filename.osm]" << std::endl;
+
+        // Path to the default map
         osm_data_file = "../map.osm";
     }
     
     std::vector<std::byte> osm_data;
  
+    // Read the map file
     if( osm_data.empty() && !osm_data_file.empty() ) {
         std::cout << "Reading OpenStreetMap data from the following file: " <<  osm_data_file << std::endl;
         auto data = ReadFile(osm_data_file);
@@ -58,7 +64,7 @@ int main(int argc, const char **argv)
     float start_x = 0.0f;
     float start_y = 0.0f;
     float end_x = 0.0f;
-    float start_y = 0.0f;
+    float end_y = 0.0f;
     
     std::cout << "Enter starting x coordinate\n";
     std::cin >> start_x;
@@ -85,6 +91,8 @@ int main(int argc, const char **argv)
     // Render results of search.
     Render render{model};
 
+
+    // Use IO2D to render the map
     auto display = io2d::output_surface{400, 400, io2d::format::argb32, io2d::scaling::none, io2d::refresh_style::fixed, 30};
     display.size_change_callback([](io2d::output_surface& surface){
         surface.dimensions(surface.display_dimensions());
