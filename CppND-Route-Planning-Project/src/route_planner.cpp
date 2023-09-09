@@ -40,7 +40,7 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 // - For each node in current_node.neighbors, add the neighbor to open_list and set the node's visited attribute to true.
 
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
-    std::cout << "AddNeighbors\n";
+    //std::cout << "AddNeighbors\n";
 
     /* --MY CODE --
     current_node->FindNeighbors();
@@ -78,7 +78,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
         RouteModel::Node *neighbor = current_node->neighbors[i];
         
         neighbor->parent = current_node;
-        neighbor->g_value = current_g + neighbor->distance(*current_node);
+        neighbor->g_value = current_g + neighbor->distance(*current_node);  // Can't just do += , it results in a segmentation fault ...?
         neighbor->h_value = CalculateHValue(neighbor);
 
         open_list.push_back(neighbor);
