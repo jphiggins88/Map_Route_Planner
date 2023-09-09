@@ -4,6 +4,9 @@ git clone https://github.com/udacity/CppND-Route-Planning-Project.git --recurse-
 // IO2D Repo
 https://github.com/cpp-io2d/P0267_RefImpl/blob/master/BUILDING.md
 
+// Also read this for additional help
+https://gist.github.com/wAuner/68ee426b87d297340826660f5ac62b79#install-dependencies
+
 To get this to work on Linux Ubuntu, do the folowing:
 
 sudo apt update

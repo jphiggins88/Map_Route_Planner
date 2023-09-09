@@ -11,8 +11,11 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 
     // TODO 2: Use the m_Model.FindClosestNode method to find the closest nodes to the starting and ending coordinates.
     // Store the nodes you find in the RoutePlanner's start_node and end_node attributes.
-    *start_node = m_Model.FindClosestNode(start_x, start_y);
-    *end_node = m_Model.FindClosestNode(end_x, end_y);
+    //!!! See the difference between the liens below!
+    //*start_node = m_Model.FindClosestNode(start_x, start_y);
+    //*end_node = m_Model.FindClosestNode(end_x, end_y);
+    start_node = &m_Model.FindClosestNode(start_x, start_y);
+    end_node = &m_Model.FindClosestNode(end_x, end_y);
 
 }
 
@@ -39,6 +42,7 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
     std::cout << "AddNeighbors\n";
 
+    /* --MY CODE --
     current_node->FindNeighbors();
     //(*current_node).FindNeighbors();
 
@@ -64,6 +68,23 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
         //??? When do we want to mark a node visited? When we've inspected it, or when we've actually gone to it?
         node->visited = true;
     }
+    */
+   current_node->FindNeighbors();
+    float current_g = current_node->g_value;
+    current_node->visited = true;
+
+    for (int i = 0; i < current_node->neighbors.size(); i++) {
+
+        RouteModel::Node *neighbor = current_node->neighbors[i];
+        
+        neighbor->parent = current_node;
+        neighbor->g_value = current_g + neighbor->distance(*current_node);
+        neighbor->h_value = CalculateHValue(neighbor);
+
+        open_list.push_back(neighbor);
+        neighbor->visited = true;
+    }
+
 
 }
 
@@ -80,9 +101,14 @@ RouteModel::Node *RoutePlanner::NextNode() {
     std::sort(open_list.begin(), open_list.end(), RoutePlanner::CompareSumOfGandH);
     // The vector of Node pointers should now be sorted according to their g+h values (ascending order).
 
+    /* -- MY CODE --
     // return the pointer to the node with the smallest g+h value.(should be the 1st node pointer in the vector)
     //??? Or return the last?
     return open_list.at(0);
+    */
+    RouteModel::Node* next = open_list.back();
+
+    return next;
 }
 
 // Utility function to compare g+h values of 2 nodes. Will be used for sorting the array of node pointers.
@@ -90,6 +116,7 @@ bool RoutePlanner::CompareSumOfGandH(RouteModel::Node* a, RouteModel::Node* b) {
     std::cout << "CompareSumOfGandH\n";
     //return (a->g_value + a->h_value)<(b->g_value + b->h_value);
     return (a->g_value + a->h_value)>(b->g_value + b->h_value); // Sorts in descending order
+    //??? Why not use < instead and just grab the beginning of the vector?
 }
 
 
@@ -107,6 +134,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
 
+    /* ----MY CODE --
     // TODO: Implement your solution here.
     // ??? could posssibly do while (node->parent != start_node)
     //??? while (current_node->parent != nullptr)
@@ -119,11 +147,26 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
         if(current_node->x == start_node->x && current_node->y == start_node->y){
             // Stop searching once start_node is found and added to the path_found vector.
             startNodeFound = true;     // Not needed with the break below. 
-            break;
+                break;
         }
         distance += current_node->distance(*current_node->parent);
         current_node = current_node->parent;
     }
+    */
+    
+    while(current_node->x != this->start_node->x && current_node->y != this->start_node->y){
+        
+        path_found.push_back(*current_node);
+        distance += current_node->distance(*current_node->parent);
+        current_node = current_node->parent;
+    }
+
+    path_found.push_back(*current_node);
+
+
+
+
+    // Provided code --------
     
     // We've added nodes to the path_found vector from finish to start. We need to reverse the order.
     std::reverse(path_found.begin(), path_found.end());
@@ -148,6 +191,7 @@ void RoutePlanner::AStarSearch() {
     // TODO: Implement your solution here.
     open_list.push_back(start_node);
 
+    /*
     //AddNeighbors(current_node);
     AddNeighbors(start_node);
 
@@ -170,7 +214,19 @@ void RoutePlanner::AStarSearch() {
 
         // Calls Find Neighbors of current node and populates current_node->neighbors vector.
         AddNeighbors(current_node);
+    }
+    */
+    while(this->open_list.size() > 0) {
 
+        current_node = this->NextNode();
+        this->open_list.pop_back();
+
+        if (current_node->x == this->end_node->x && current_node->y == this->end_node->y) {
+            m_Model.path = ConstructFinalPath(current_node);
+            break;
+        }
+
+        AddNeighbors(current_node);           
     }
 
 }
