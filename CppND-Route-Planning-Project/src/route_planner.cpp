@@ -2,6 +2,7 @@
 #include <algorithm>
 
 RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, float end_x, float end_y): m_Model(model) {
+    std::cout << "RoutePlanner constructor\n";
     // Convert inputs to percentage:
     start_x *= 0.01;
     start_y *= 0.01;
@@ -22,6 +23,7 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 // - Node objects have a distance method to determine the distance to another node.
 
 float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
+    std::cout << "CalculateHValue\n";
     //return (*node).distance(*end_node);    // Distance from the start node to the end node?
     return node->distance(*end_node);    // Distance from the start node to the end node?
 }
@@ -35,6 +37,7 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 // - For each node in current_node.neighbors, add the neighbor to open_list and set the node's visited attribute to true.
 
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
+    std::cout << "AddNeighbors\n";
 
     current_node->FindNeighbors();
     //(*current_node).FindNeighbors();
@@ -57,6 +60,8 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
         // add neighbor to open list and set node's visited attribute to true.
         //??? current_node->open_list.push_back(node);
         open_list.push_back(node);
+
+        //??? When do we want to mark a node visited? When we've inspected it, or when we've actually gone to it?
         node->visited = true;
     }
 
@@ -71,6 +76,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Return the pointer.
 
 RouteModel::Node *RoutePlanner::NextNode() {
+    std::cout << "NextNode\n";
     std::sort(open_list.begin(), open_list.end(), RoutePlanner::CompareSumOfGandH);
     // The vector of Node pointers should now be sorted according to their g+h values (ascending order).
 
@@ -81,7 +87,9 @@ RouteModel::Node *RoutePlanner::NextNode() {
 
 // Utility function to compare g+h values of 2 nodes. Will be used for sorting the array of node pointers.
 bool RoutePlanner::CompareSumOfGandH(RouteModel::Node* a, RouteModel::Node* b) {
-    return (a->g_value + a->h_value)<(b->g_value + b->h_value);
+    std::cout << "CompareSumOfGandH\n";
+    //return (a->g_value + a->h_value)<(b->g_value + b->h_value);
+    return (a->g_value + a->h_value)>(b->g_value + b->h_value); // Sorts in descending order
 }
 
 
@@ -94,6 +102,7 @@ bool RoutePlanner::CompareSumOfGandH(RouteModel::Node* a, RouteModel::Node* b) {
 //   of the vector, the end node should be the last element.
 
 std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node *current_node) {
+    std::cout << "ConstuctFinalPath\n";
     // Create path_found vector
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
@@ -101,7 +110,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     // TODO: Implement your solution here.
     // ??? could posssibly do while (node->parent != start_node)
     //??? while (current_node->parent != nullptr)
-    bool startNodeFound;
+    bool startNodeFound = false;
     while (!startNodeFound)
     {
         path_found.push_back(*current_node);
@@ -133,15 +142,18 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 // - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
 
 void RoutePlanner::AStarSearch() {
+    std::cout << "AStarSearch\n";
     RouteModel::Node *current_node = nullptr;
 
     // TODO: Implement your solution here.
     open_list.push_back(start_node);
 
-    AddNeighbors(current_node);
+    //AddNeighbors(current_node);
+    AddNeighbors(start_node);
 
     while(open_list.size() > 0)
     {
+        std::cout << "AStarSearch - while\n";
         //??? what is the status of open_list at the beginning of this?
         //??? Isn't open_list empy until FindNeighbor is called. (AddNeighbors calls FindNeighbors)
 

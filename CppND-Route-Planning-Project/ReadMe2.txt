@@ -38,3 +38,5 @@ make
 
 // Test your code with the supplied unit tests
 ./test
+
+// I've added "target_compile_options(OSM_A_star_search PUBLIC -g)" to CmakeList.txt so the code will compile with the debug symbols.

@@ -44,8 +44,11 @@ target_link_libraries(test
 # Set options for Linux or Microsoft Visual C++
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
     target_link_libraries(OSM_A_star_search PUBLIC pthread)
+    # Added by me (PH)
+    target_compile_options(OSM_A_star_search PUBLIC -g)
 endif()
 
 if(MSVC)
 	target_compile_options(OSM_A_star_search PUBLIC /D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING /wd4459)
 endif()
+
