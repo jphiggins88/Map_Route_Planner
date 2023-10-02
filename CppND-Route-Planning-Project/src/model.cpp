@@ -48,6 +48,14 @@ Model::Model( const std::vector<std::byte> &xml )
     });
 }
 
+/**
+ * @brief Read and parse the XML map data
+ *
+ * Accepts a reference to the XML map data, gets bounds of map, and completely parses map nodes.
+ *
+ * @param xml Accepts a reference to the map XML data
+ * @return void
+ */
 void Model::LoadData(const std::vector<std::byte> &xml)
 {
     using namespace pugi;

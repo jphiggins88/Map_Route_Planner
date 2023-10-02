@@ -11,6 +11,15 @@
 
 using namespace std::experimental;
 
+/**
+ * @brief Read a file and return the contents
+ *
+ * Accepts a reference to a path and attempts to read using an ifstream.
+ * If the file is empty or does not exist, nullopt is returned.
+ *
+ * @param path Reference to the path of the file to be read
+ * @return (optional) vector<byte> containing the contents of the file, or nullopt if file is empty or does not exist.
+ */
 static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
 {   
     std::ifstream is{path, std::ios::binary | std::ios::ate};
@@ -28,6 +37,16 @@ static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
     return std::move(contents);
 }
 
+//TODO Add Doxygen comments and add parsing to the input to make sure appropriate values are entered. (range checking and positive ints/floats only.)
+static void getUserCoordinates(float& start_x, float& start_y, float& end_x, float& end_y)
+{
+    std::cout << "Enter starting coordinates (separated by a space):\n";
+    std::cin >> start_x >> start_y;
+    std::cout << "Enter ending coordinates (separated by a space):\n";
+    std::cin >> end_x >> end_y;
+}
+
+
 int main(int argc, const char **argv)
 {    
     std::string osm_data_file = "";
@@ -35,8 +54,9 @@ int main(int argc, const char **argv)
     // Allow user to start the executable with an argument to load a custom map
     if( argc > 1 ) {
         for( int i = 1; i < argc; ++i )
+            // string_view provides a non-owning view into a sequence of characters
             if( std::string_view{argv[i]} == "-f" && ++i < argc )
-                osm_data_file = argv[i];
+                osm_data_file = "../maps/" + std::string{argv[i]};
     }
     // Load the default map
     else {
@@ -44,7 +64,7 @@ int main(int argc, const char **argv)
         std::cout << "Usage: [executable] [-f filename.osm]" << std::endl;
 
         // Path to the default map
-        osm_data_file = "../map.osm";
+        osm_data_file = "../maps/map_Irvine1.osm";
     }
     
     std::vector<std::byte> osm_data;
@@ -56,34 +76,18 @@ int main(int argc, const char **argv)
         if( !data )
             std::cout << "Failed to read." << std::endl;
         else
-            osm_data = std::move(*data);
+                osm_data = std::move(*data);
     }
     
-    // TODO 1: Declare floats `start_x`, `start_y`, `end_x`, and `end_y` and get
-    // user input for these values using std::cin. Pass the user input to the
-    // RoutePlanner object below in place of 10, 10, 90, 90.
-    float start_x = 0.0f;
-    float start_y = 0.0f;
-    float end_x = 0.0f;
-    float end_y = 0.0f;
-    
-    std::cout << "Enter starting x coordinate\n";
-    std::cin >> start_x;
-    std::cout << "Enter starting y coordinate\n";
-    std::cin >> start_y;
-    std::cout << "Enter ending x coordinate\n";
-    std::cin >> end_x;
-    std::cout << "Enter ending y coordinate\n";
-    std::cin >> end_y;
-
-
-
+    //TODO, give the option eventually to point and click 2 spots on the map.
+    // Get user input in individual coordinates
+    float start_x, start_y, end_x, end_y;
+    getUserCoordinates(start_x, start_y, end_x, end_y);
 
     // Build Model.
     RouteModel model{osm_data};
 
     // Create RoutePlanner object and perform A* search.
-    //RoutePlanner route_planner{model, 10, 10, 90, 90};
     RoutePlanner route_planner{model, start_x, start_y, end_x, end_y};
     route_planner.AStarSearch();
 
@@ -91,7 +95,6 @@ int main(int argc, const char **argv)
 
     // Render results of search.
     Render render{model};
-
 
     // Use IO2D to render the map
     auto display = io2d::output_surface{400, 400, io2d::format::argb32, io2d::scaling::none, io2d::refresh_style::fixed, 30};
