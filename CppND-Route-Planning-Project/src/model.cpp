@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <assert.h>
 
-static Model::Road::Type String2RoadType(std::string_view type)
+static Model::Road::Type Road_GetTypeFromString(std::string_view type)
 {
     if( type == "motorway" )        return Model::Road::Motorway;
     if( type == "trunk" )           return Model::Road::Trunk;
@@ -25,7 +25,7 @@ static Model::Road::Type String2RoadType(std::string_view type)
     return Model::Road::Invalid;    
 }
 
-static Model::Landuse::Type String2LanduseType(std::string_view type)
+static Model::Landuse::Type Land_GetTypeFromString(std::string_view type)
 {
     if( type == "commercial" )      return Model::Landuse::Commercial;
     if( type == "construction" )    return Model::Landuse::Construction;
@@ -102,7 +102,7 @@ void Model::LoadData(const std::vector<std::byte> &xml)
                 auto category = std::string_view{child.attribute("k").as_string()};
                 auto type = std::string_view{child.attribute("v").as_string()};
                 if( category == "highway" ) {
-                    if( auto road_type = String2RoadType(type); road_type != Road::Invalid ) {
+                    if( auto road_type = Road_GetTypeFromString(type); road_type != Road::Invalid ) {
                         m_Roads.emplace_back();
                         m_Roads.back().way = way_num;
                         m_Roads.back().type = road_type;
@@ -127,7 +127,7 @@ void Model::LoadData(const std::vector<std::byte> &xml)
                     m_Waters.back().outer = {way_num};
                 }
                 else if( category == "landuse" ) {
-                    if( auto landuse_type = String2LanduseType(type); landuse_type != Landuse::Invalid ) {
+                    if( auto landuse_type = Land_GetTypeFromString(type); landuse_type != Landuse::Invalid ) {
                         m_Landuses.emplace_back();
                         m_Landuses.back().outer = {way_num};
                         m_Landuses.back().type = landuse_type;
@@ -171,7 +171,7 @@ void Model::LoadData(const std::vector<std::byte> &xml)
                     break;
                 }
                 if( category == "landuse" ) {
-                    if( auto landuse_type = String2LanduseType(type); landuse_type != Landuse::Invalid ) {
+                    if( auto landuse_type = Land_GetTypeFromString(type); landuse_type != Landuse::Invalid ) {
                         commit( m_Landuses.emplace_back() );
                         m_Landuses.back().type = landuse_type;
                         BuildRings(m_Landuses.back());
