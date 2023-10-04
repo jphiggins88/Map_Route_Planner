@@ -1,0 +1,11 @@
+*.swp
+!map.osm
+*.o
+draw.cpp
+test.cpp
+build/
+bin/
+lib/
+.github/**
+IO2D/
+thirdparty/
