@@ -1,6 +1,6 @@
 # Route Planning Project
 
-This project is based on the [Udacity Route Planner Course] (https://github.com/udacity/CppND-Route-Planning-Project)
+This project is based on the [Udacity Route Planner Course](https://github.com/udacity/CppND-Route-Planning-Project)
 All rendering is done using the IO2D library.
 
 Using the A* search algorithm, the quickest route between 2 selected points on a map is found. The user is prompted to enter starting and ending coordinates. The program will then calculate the closest map node to each point, calculate the distance to neighboring nodes, and add a heuristic value to each possible neighboring node calculation in order to find an efficent way to get from the starting node to the ending node.
